@@ -1,9 +1,17 @@
 package org.firstinspires.ftc.teamcode.DemoRobot;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 @Autonomous (name = "DemoAuto")
 public class DemoAuto extends LinearOpMode {
@@ -13,12 +21,47 @@ public class DemoAuto extends LinearOpMode {
 
     DemoHardware robot = DemoHardware.getInstance();
 
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+    OpenCvCamera webCam;
+
+    private int position = 1;
+
+    private Pipeline detector;
+    //
     public void runOpMode(){
 
         robot.init(hardwareMap);
         telemetry.addData("Status", "Hello, drivers!");
         //if using camera to keep updating and reading (like color sensor)
         telemetry.update();
+
+        int cameraMonitorViewID = hardwareMap.appContext.getResources()
+                .getIdentifier("cameraMonitorViewID", "id",
+                        hardwareMap.appContext.getPackageName());
+        detector = new Pipeline();
+        webCam = OpenCvCameraFactory.getInstance().createWebcam
+                (hardwareMap.get(WebcamName.class, "demoCam"),
+                        cameraMonitorViewID);
+
+        webCam.openCameraDevice();
+
+        FtcDashboard.getInstance().startCameraStream(webCam, 0);
+        webCam.startStreaming(640, 480, OpenCvCameraRotation.UPSIDE_DOWN);
+
+        webCam.setPipeline(detector);
+
+        while (!isStarted() && !isStopRequested()){
+            position = detector.position;
+            telemetry.addData("Position", position);
+            telemetry.addData("totalA", detector.totalA);
+            telemetry.update();
+
+            dashboardTelemetry.addData("position", position);
+            dashboardTelemetry.addData("totalA", detector.totalA);
+            dashboardTelemetry.update();
+        }
 
         waitForStart();
 
