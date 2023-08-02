@@ -65,7 +65,16 @@ public class DemoAuto extends LinearOpMode {
 
         waitForStart();
 
-        move(62, 0.5);
+        if(position == 1){
+            move(68, 0.8);
+            turning(90);
+        } else if(position == 2){
+            //goes to pos 2
+        } else{
+            move(18, 0.3);
+        }
+
+
 
         runtime.reset();
         while(runtime.seconds() < 5){
