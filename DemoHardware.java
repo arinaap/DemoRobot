@@ -15,6 +15,8 @@ public class DemoHardware {
     public DcMotor rf;
     public DcMotor rb;
 
+    public DcMotor demoMotor;
+
     public Servo demoServo;
 
     public BNO055IMU gyro;
@@ -74,6 +76,16 @@ public class DemoHardware {
             rb = null;
 
         } try{
+            demoMotor = hwMap.get(DcMotor.class, "demoMotor");
+            demoMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            demoMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            demoMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            demoMotor.setPower(0);
+
+        } catch (Exception p_exception) {
+            rb = null;
+
+        }try{
             gyro = hwMap.get(BNO055IMU.class, "gyro");
             BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
